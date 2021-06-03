@@ -4,9 +4,9 @@
     "description": "This app integrates with HackerOne to support various generic and investigative actions",
     "publisher": "Splunk Community",
     "type": "generic",
-    "main_module": "hackerone_connector.py",
-    "app_version": "2.0.1",
-    "utctime_updated": "2021-05-10T06:09:05.000000Z",
+    "main_module": "hackerone_connector.pyc",
+    "app_version": "2.2.0",
+    "utctime_updated": "2020-01-28T00:00:00.000000Z",
     "package_name": "phantom_hackerone",
     "product_vendor": "HackerOne",
     "product_name": "HackerOne",
@@ -55,6 +55,11 @@
             "data_type": "password",
             "order": 6,
             "required": true
+        },
+        "debug_logging": {
+            "description": "Toggle verbose logging in debug log and spawn log",
+            "data_type": "boolean",
+            "order": 7
         }
     },
     "actions": [
@@ -342,7 +347,8 @@
                 "full_comments": {
                     "description": "Collect comments for reports (much slower)",
                     "data_type": "boolean",
-                    "order": 2
+                    "order": 2,
+                    "required": true
                 }
             },
             "output": [
@@ -430,7 +436,8 @@
                 "full_comments": {
                     "description": "Collect comments for reports (much slower)",
                     "data_type": "boolean",
-                    "order": 2
+                    "order": 2,
+                    "required": true
                 },
                 "range": {
                     "description": "How many minutes back to get changed reports from",
