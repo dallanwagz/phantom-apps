@@ -18,22 +18,28 @@ from bs4 import UnicodeDammit
 class HackerOneConnector(BaseConnector):
 
     is_polling_action = False
+    debug_logging = False
 
     def __init__(self):
         super(HackerOneConnector, self).__init__()
         return
 
-    def __print(self, object):
+    def __print(self, object, force):
         message = 'Failed to cast message to string'
         try:
             message = str(object)
+            message = message.decode('utf-8')
         except:
             pass
 
-        if self.is_polling_action:
-            self.debug_print('HackerOne {}'.format(message))
-        else:
-            self.save_progress(message)
+        if self.debug_logging:
+            self.debug_print('HackerOne', message)
+            self.save_progress( message )
+        elif self.is_polling_action:
+            self.debug_print('HackerOne', message)
+        elif force:
+            self.debug_print('HackerOne', message)
+            self.save_progress( message )
 
     def _validate_integer(self, action_result, parameter, key):
         if parameter is not None:
@@ -123,82 +129,82 @@ class HackerOneConnector(BaseConnector):
         return HEADERS
 
     def _get_phantom_data(self, endpoint):
-        self.__print('Start: _get_phantom_data(): {0}'.format(datetime.datetime.now()))
+        self.__print('Start: _get_phantom_data()', False)
         try:
-            self.__print(endpoint)
+            self.__print(endpoint, False)
             response = requests.get(endpoint, headers=self._get_phantom_headers(), verify=False)
             try:
                 content = json.loads(response.text)
             except Exception as e:
-                self.__print("Error parsing JSON Object: {}".format(self._get_error_message_from_exception(e)))
+                self.__print("Error parsing JSON Object: {}".format(self._get_error_message_from_exception(e)), False)
                 return None
             code = response.status_code
             if code == 200:
-                self.__print('Finish: _get_phantom_data(): {0}'.format(datetime.datetime.now()))
+                self.__print('Finish: _get_phantom_data()', False)
                 return content
             else:
-                self.__print(code)
-                self.__print(content)
-                self.__print('Finish: _get_phantom_data(): {0}'.format(datetime.datetime.now()))
+                self.__print(code, False)
+                self.__print(content, False)
+                self.__print('Finish: _get_phantom_data()', False)
                 return None
         except Exception as e:
             err = self._get_error_message_from_exception(e)
-            self.__print(err)
-            self.__print('Finish: _get_phantom_data(): {0}'.format(datetime.datetime.now()))
+            self.__print(err, True)
+            self.__print('Finish: _get_phantom_data()', False)
             return None
 
     def _post_phantom_data(self, url, dictionary):
-        self.__print('Start: _post_phantom_data(): {0}'.format(datetime.datetime.now()))
+        self.__print('Start: _post_phantom_data()', False)
         try:
-            self.__print(url)
+            self.__print(url, False)
             response = requests.post(url, headers=self._get_phantom_headers(), json=dictionary, verify=False)
             try:
                 content = json.loads(response.text)
             except Exception as e:
-                self.__print("Error parsing JSON Object: {}".format(self._get_error_message_from_exception(e)))
+                self.__print("Error parsing JSON Object: {}".format(self._get_error_message_from_exception(e)), False)
                 return None
             code = response.status_code
             if code >= 200 and code < 300:
-                self.__print('Finish: _post_phantom_data(): {0}'.format(datetime.datetime.now()))
+                self.__print('Finish: _post_phantom_data()', False)
                 return code
             else:
-                self.__print(code)
-                self.__print(content)
-                self.__print('Finish: _post_phantom_data(): {0}'.format(datetime.datetime.now()))
+                self.__print(code, False)
+                self.__print(content, False)
+                self.__print('Finish: _post_phantom_data()', False)
                 return None
         except Exception as e:
             err = self._get_error_message_from_exception(e)
-            self.__print(err)
+            self.__print(err, True)
             return None
 
     def _delete_phantom_data(self, url):
-        self.__print('Start: _delete_phantom_data(): {0}'.format(datetime.datetime.now()))
+        self.__print('Start: _delete_phantom_data()', False)
         try:
-            self.__print(url)
+            self.__print(url, False)
             response = requests.delete(url, headers=self._get_phantom_headers(), verify=False)
             try:
                 content = json.loads(response.text)
             except Exception as e:
-                self.__print("Error parsing JSON Object: {}".format(self._get_error_message_from_exception(e)))
+                self.__print("Error parsing JSON Object: {}".format(self._get_error_message_from_exception(e)), False)
                 return None
             code = response.status_code
             if code >= 200 and code < 300:
-                self.__print('Finish: _delete_phantom_data(): {0}'.format(datetime.datetime.now()))
+                self.__print('Finish: _delete_phantom_data()', False)
                 return code
             else:
-                self.__print(code)
-                self.__print(content)
-                self.__print('Finish: _delete_phantom_data(): {0}'.format(datetime.datetime.now()))
+                self.__print(code, False)
+                self.__print(content, False)
+                self.__print('Finish: _delete_phantom_data()', False)
                 return None
         except Exception as e:
             err = self._get_error_message_from_exception(e)
-            self.__print(err)
+            self.__print(err, True)
             return None
 
     def _get_rest_data(self, url, url_params):
-        self.debug_print('Start: _get_rest_data(): {0}'.format(datetime.datetime.now()))
+        self.__print('Start: _get_rest_data()', False)
         try:
-            self.__print("Connecting to endpoint '{}'".format(url))
+            self.__print(url, False)
             u, p = self._get_auth()
             if url_params:
                 response = requests.get(url, auth=(u, p), params=url_params, headers=self._get_headers(), verify=False)
@@ -207,7 +213,7 @@ class HackerOneConnector(BaseConnector):
             try:
                 content = json.loads(response.text)
             except Exception as e:
-                self.__print("Error parsing JSON Object: {}".format(self._get_error_message_from_exception(e)))
+                self.__print("Error parsing JSON Object: {}".format(self._get_error_message_from_exception(e)), False)
                 return None, None
             code = response.status_code
             if code == 200:
@@ -216,58 +222,58 @@ class HackerOneConnector(BaseConnector):
                 else:
                     return content['data'], None
             else:
-                self.debug_print(code)
-                self.debug_print(content)
+                self.__print(code, False)
+                self.__print(content, False)
                 return None, None
         except Exception as e:
             err = self._get_error_message_from_exception(e)
-            self.__print(err)
+            print(err, True)
             return None, None
 
     def _put_rest_data(self, url, dictionary):
-        self.__print('Start: _put_rest_data(): {0}'.format(datetime.datetime.now()))
+        self.__print('Start: _put_rest_data()', False)
         try:
-            self.__print(url)
+            self.__print(url, False)
             u, p = self._get_auth()
             response = requests.put(url, auth=(u, p), headers=self._get_headers(), json=dictionary, verify=False)
             content = response.text
             code = response.status_code
             if code >= 200 and code < 300:
-                self.__print('Finish: _put_rest_data(): {0}'.format(datetime.datetime.now()))
+                self.__print('Finish: _put_rest_data()', False)
                 return code
             else:
-                self.__print(code)
-                self.__print(content)
-                self.__print('Finish: _put_rest_data(): {0}'.format(datetime.datetime.now()))
+                self.__print(code, False)
+                self.__print(content, False)
+                self.__print('Finish: _put_rest_data()', False)
                 return None
         except Exception as e:
             err = self._get_error_message_from_exception(e)
-            self.__print(err)
+            self.__print(err, True)
             return None
 
     def _post_rest_data(self, url, dictionary):
-        self.__print('Start: _post_rest_data(): {0}'.format(datetime.datetime.now()))
+        self.__print('Start: _post_rest_data()', False)
         try:
-            self.__print(url)
+            self.__print(url, False)
             u, p = self._get_auth()
             response = requests.post(url, auth=(u, p), headers=self._get_headers(), json=dictionary, verify=False)
             content = response.text
             code = response.status_code
             if code >= 200 and code < 300:
-                self.__print('Finish: _post_rest_data(): {0}'.format(datetime.datetime.now()))
+                self.__print('Finish: _post_rest_data()', False)
                 return code
             else:
-                self.__print(code)
-                self.__print(content)
-                self.__print('Finish: _post_rest_data(): {0}'.format(datetime.datetime.now()))
+                self.__print(code, False)
+                self.__print(content, False)
+                self.__print('Finish: _post_rest_data()', False)
                 return None
         except Exception as e:
             err = self._get_error_message_from_exception(e)
-            self.__print(err)
+            self.__print(err, True)
             return None
 
     def _add_report_artifact(self, report):
-        self.__print('_add_report_artifact()')
+        self.__print('_add_report_artifact()', False)
         artifact = {}
         artifact['container_id'] = self.get_container_id()
         artifact['label'] = 'Report'
@@ -278,7 +284,7 @@ class HackerOneConnector(BaseConnector):
         self.save_artifact(artifact)
 
     def _add_report_artifacts(self, reports):
-        self.__print('_add_report_artifacts()')
+        self.__print('_add_report_artifacts()', False)
         artifacts = []
         for report in reports:
             cef = report
@@ -293,7 +299,7 @@ class HackerOneConnector(BaseConnector):
         self.save_artifacts(artifacts)
 
     def _update_tracking_id(self, param, action_result):
-        self.__print('_update_tracking_id()')
+        self.__print('_update_tracking_id()', False)
         report_id = self._handle_unicode_for_input_str(param.get('report_id'))
         tracking_id = self._handle_unicode_for_input_str(param.get('tracking_id'))
         try:
@@ -307,19 +313,19 @@ class HackerOneConnector(BaseConnector):
             }
             url = "https://api.hackerone.com/v1/reports/{0}/issue_tracker_reference_id".format(report_id)
             if self._post_rest_data(url, data):
-                self.__print('Successfully updated tracking id')
+                self.__print('Successfully updated tracking id', True)
                 return action_result.set_status(phantom.APP_SUCCESS, 'Successfully updated tracking id')
             else:
-                self.__print('Failed to update tracking id.')
+                self.__print('Failed to update tracking id.', True)
                 return action_result.set_status(phantom.APP_ERROR, 'Failed to update tracking id')
         except Exception as e:
             err = self._get_error_message_from_exception(e)
-            self.__print('Exception occurred while updating tracking id')
+            self.__print('Exception occurred while updating tracking id', True)
             action_result.add_exception_details(err)
             return action_result.set_status(phantom.APP_ERROR, 'Exception occurred while updating tracking id')
 
     def _unassign_report(self, param, action_result):
-        self.__print('_unassign_report()')
+        self.__print('_unassign_report()', False)
         report_id = self._handle_unicode_for_input_str(param.get('report_id'))
         try:
             data = {
@@ -329,14 +335,14 @@ class HackerOneConnector(BaseConnector):
             }
             url = "https://api.hackerone.com/v1/reports/{0}/assignee".format(report_id)
             if self._put_rest_data(url, data):
-                self.__print('Successfully removed report assignment')
+                self.__print('Successfully removed report assignment', True)
                 return action_result.set_status(phantom.APP_SUCCESS, 'Successfully removed report assignment')
             else:
-                self.__print('Failed to remove report assignment')
+                self.__print('Failed to remove report assignment', True)
                 return action_result.set_status(phantom.APP_ERROR, 'Failed to remove report assignment')
         except Exception as e:
             err = self._get_error_message_from_exception(e)
-            self.__print('Exception occurred while updating tracking id')
+            self.__print('Exception occurred while updating tracking id', True)
             action_result.add_exception_details(err)
             return action_result.set_status(phantom.APP_ERROR, 'Exception occurred while updating tracking id')
 
@@ -393,8 +399,24 @@ class HackerOneConnector(BaseConnector):
         except:
             pass
 
+    def _migrate_comment_attachments(self, report_json):
+        try:
+            for comment in report_json['comments']:
+                try:
+                    for attachment in comment['comment-attachments']:
+                        try:
+                            report_json['attachments'].append(attachment)
+                        except:
+                            pass
+                    del comment['comment-attachments']
+                except:
+                    pass
+        except:
+            pass
+        return report_json
+
     def _parse_report(self, report):
-        self.__print('_parse_report()')
+        self.__print('_parse_report()', False)
         core_report = {}
         report_template = None
         __location__ = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
@@ -402,51 +424,52 @@ class HackerOneConnector(BaseConnector):
             report_template = json.load(json_file)
         report_template = eval(json.dumps(report_template))
         self._get_leaves(report_template, report, core_report)
+        self._migrate_comment_attachments(core_report)
         self._get_cvf(core_report)
         return core_report
 
     def _get_complete_report(self, report_id):
-        self.__print('_get_complete_report()')
+        self.__print('_get_complete_report()', False)
         report, links = self._get_rest_data('https://api.hackerone.com/v1/reports/{0}'.format(report_id), None)
         report = self._parse_report(report)
         return report
 
     def _get_filtered_reports(self, program, state, assignment, add_comments, date):
-        self.__print('_get_filtered_reports()')
+        self.__print('_get_filtered_reports()', False)
         try:
             url_params = {}
 
-            self.__print('Get program filter:')
+            self.__print('Get program filter:', True)
             url_params['filter[program][]'] = program
-            self.__print(json.dumps(url_params))
+            self.__print(json.dumps(url_params), True)
 
-            self.__print('Get state filter:')
+            self.__print('Get state filter:', True)
             if state:
                 url_params['filter[state][]'] = self._parse_list(state)
-                self.__print(json.dumps(url_params))
+                self.__print(json.dumps(url_params), True)
 
-            self.__print('Get assignment filter:')
+            self.__print('Get assignment filter:', True)
             if assignment:
                 url_params['filter[assignee][]'] = self._parse_list(assignment)
-                self.__print(json.dumps(url_params))
+                self.__print(json.dumps(url_params), True)
 
-            self.__print('Get date filter:')
+            self.__print('Get date filter:', True)
             if date:
                 url_params['filter[last_activity_at__gt]'] = date
-                self.__print(json.dumps(url_params))
+                self.__print(json.dumps(url_params), True)
 
             url_params['page[size]'] = 100
-            self.__print(json.dumps(url_params))
+            self.__print(json.dumps(url_params), True)
 
             report_set = []
-            self.__print('get rest data')
+            self.__print('get rest data', False)
             reports, links = self._get_rest_data('https://api.hackerone.com/v1/reports', url_params)
-            self.__print(len(reports) if reports else 0)
-            self.__print('Entering paging')
+            self.__print(len(reports) if reports else 0, False)
+            self.__print('Entering paging', False)
             while True:
-                self.__print('loop')
+                self.__print('loop', False)
                 if not reports or reports == []:
-                    self.__print('No reports for the range')
+                    self.__print('No reports for the range', True)
                     break
                 for report in reports:
                     if add_comments:
@@ -456,14 +479,14 @@ class HackerOneConnector(BaseConnector):
                         report_set.append(self._parse_report(report))
                 try:
                     reports, links = self._get_rest_data(links['next'], None)
-                    self.__print('Next page')
+                    self.__print('Next page', False)
                 except:
                     break
             return report_set
         except Exception as e:
             err = self._get_error_message_from_exception(e)
-            self.__print('Exception occurred while gathering reports')
-            self.__print(err)
+            self.__print('Exception occurred while gathering reports', True)
+            self.__print(err, True)
             return None
 
     def _get_report(self, param, action_result):
@@ -471,15 +494,15 @@ class HackerOneConnector(BaseConnector):
             id = self._handle_unicode_for_input_str(param.get('report_id'))
             report = self._get_complete_report(id)
             if not report:
-                self.__print('No report found')
+                self.__print('No report found', True)
                 return action_result.set_status(phantom.APP_ERROR, 'Failed to get report')
             action_result.add_data(report)
             self._add_report_artifact(report)
-            self.__print('Successfully collected report')
+            self.__print('Successfully collected report', True)
             return action_result.set_status(phantom.APP_SUCCESS, 'Successfully collected report')
         except Exception as e:
             err = self._get_error_message_from_exception(e)
-            self.__print('Failed to get report')
+            self.__print('Failed to get report', True)
             action_result.add_exception_details(err)
             return action_result.set_status(phantom.APP_ERROR, 'Failed to get report')
 
@@ -492,15 +515,15 @@ class HackerOneConnector(BaseConnector):
             add_comments = param.get('full_comments', False)
             reports = self._get_filtered_reports(program, state, assignment, add_comments, None)
             if not reports:
-                self.__print('No reports found')
+                self.__print('No reports found', True)
                 return action_result.set_status(phantom.APP_ERROR, "Failed to get reports")
             action_result.add_data({'reports': reports, 'count': len(reports)})
             self._add_report_artifacts(reports)
-            self.__print('Successfully collected reports')
+            self.__print('Successfully collected reports', True)
             return action_result.set_status(phantom.APP_SUCCESS, 'Successfully collected reports')
         except Exception as e:
             err = self._get_error_message_from_exception(e)
-            self.__print('Failed to get reports')
+            self.__print('Failed to get reports', True)
             action_result.add_exception_details(err)
             return action_result.set_status(phantom.APP_ERROR, 'Failed to get reports')
 
@@ -517,19 +540,19 @@ class HackerOneConnector(BaseConnector):
             if phantom.is_fail(ret_val):
                 return action_result.get_status()
 
-            self.debug_print("There might be timezone variance. Please check for the timezone variance.")
-            date = (datetime.datetime.now() - datetime.timedelta(minutes=minutes)).strftime('%Y-%m-%dT%H:%M:%S.%fZ')
+            self.__print("There might be timezone variance. Please check for the timezone variance.", True)
+            date = (datetime.datetime.utcnow() - datetime.timedelta(minutes=minutes)).strftime('%Y-%m-%dT%H:%M:%S.%fZ')
             reports = self._get_filtered_reports(program, state, assignment, add_comments, date)
             if not reports:
-                self.__print('No reports found')
+                self.__print('No reports found', True)
                 return action_result.set_status(phantom.APP_ERROR, 'Failed to get reports')
             action_result.add_data({'reports': reports, 'count': len(reports)})
             self._add_report_artifacts(reports)
-            self.__print('Successfully collected reports')
+            self.__print('Successfully collected reports', True)
             return action_result.set_status(phantom.APP_SUCCESS, 'Successfully collected reports')
         except Exception as e:
             err = self._get_error_message_from_exception(e)
-            self.__print('Failed to get reports')
+            self.__print('Failed to get reports', True)
             action_result.add_exception_details(err)
             return action_result.set_status(phantom.APP_ERROR, 'Failed to get reports')
 
@@ -557,24 +580,27 @@ class HackerOneConnector(BaseConnector):
                 artifacts.append(artifact)
         return artifacts
 
-    def _test(self, action_result, param):
-        self.debug_print('_test()')
+    def _test( self, action_result, param ):
+        self.__print('_test()', False)
         try:
             config = self.get_config()
             url_params = {'filter[program][]': self._handle_unicode_for_input_str(config['program_name']), 'page[size]': 1}
-            reports, _ = self._get_rest_data('https://api.hackerone.com/v1/reports', url_params)
+            reports = self._get_rest_data('https://api.hackerone.com/v1/reports', url_params)
             if reports:
+                self.__print('Successfully connected to HackerOne', True)
                 return action_result.set_status(phantom.APP_SUCCESS, 'Test connectivity passed')
             else:
-                return action_result.set_status(phantom.APP_ERROR, 'Test connectivity failed')
+                self.__print('Failed to connect to HackerOne', True)
+                return action_result.set_status(phantom.APP_ERROR, 'Test connectivity passed')
         except Exception as e:
             err = self._get_error_message_from_exception(e)
+            self.__print('Failed to connect to HackerOne', True)
             action_result.add_exception_details(err)
             return action_result.set_status(phantom.APP_ERROR, 'Test connectivity failed')
 
     def _on_poll(self, param):
-        self.__print('_on_poll()')
-        self.debug_print("There might be timezone variance. Please check for the timezone variance.")
+        self.__print('_on_poll()', False)
+        self.__print("There might be timezone variance. Please check for the timezone variance.", False)
         current_time_marker = datetime.datetime.utcnow()
         previous_time_marker = None
         self.load_state()
@@ -582,7 +608,10 @@ class HackerOneConnector(BaseConnector):
         try:
             previous_time_marker = current_state['time_marker']
         except:
-            current_state['time_marker'] = current_time_marker.strftime('%Y-%m-%dT%H:%M:%S.%fZ')
+            current_state['time_marker'] = current_time_marker.strftime( '%Y-%m-%dT%H:%M:%S.%fZ' )
+            self.save_state( current_state )
+            self.__print('Failed to retrieve time from state file. Resetting to current time', True)
+            previous_time_marker = current_state['time_marker']
 
         login_url = self._get_phantom_base_url()
         config = self.get_config()
@@ -594,7 +623,7 @@ class HackerOneConnector(BaseConnector):
 
         date = None
         if self.is_poll_now():
-            self.debug_print("There might be timezone variance. Please check for the timezone variance.")
+            self.__print("There might be timezone variance. Please check for the timezone variance.", True)
             date = (datetime.datetime.utcnow() - datetime.timedelta(hours=hours)).strftime('%Y-%m-%dT%H:%M:%S.%fZ')
         else:
             date = previous_time_marker
@@ -610,7 +639,7 @@ class HackerOneConnector(BaseConnector):
         add_comments = config.get('full_comments', False)
         reports = self._get_filtered_reports(program, state, assignment, add_comments, date)
         if reports is not None:
-            self.save_progress('{0} reports were returned'.format(len(reports)))
+            self.__print('{0} reports were returned'.format(len(reports)), False)
             for report in reports:
                 existing_container = None
                 container_name = 'H1 {0}: {1}'.format(report['id'], re.sub(r'[^\x00-\x7f]', r'', report['title']))
@@ -681,21 +710,21 @@ class HackerOneConnector(BaseConnector):
                                 artifact['run_automation'] = True
                                 artifact['source_data_identifier'] = '{0}-HackerOne-Report'.format(report['id'])
                                 status, message, artid = self.save_artifact(artifact)
-                                self.__print(status)
-                                self.__print(message)
-                                self.__print(artid)
+                                self.__print( status, False )
+                                self.__print( message, False )
+                                self.__print( artid, False )
                                 added_report = True
                         if artifact['name'] not in duplicates:
                             artifact['container_id'] = existing_container
                             self.save_artifact(artifact)
-                self.__print('Successfully stored report container')
+                self.__print('Successfully stored report container', True)
 
             current_state['time_marker'] = current_time_marker.strftime('%Y-%m-%dT%H:%M:%S.%fZ')
             self.save_state(current_state)
             return self.set_status(phantom.APP_SUCCESS, 'Successfully stored report data')
         else:
-            self.__print('Failed to connect to HackerOne')
-            self.save_progress('Failed to connect to HackerOne')
+            self.__print('Failed to connect to HackerOne', True)
+            self.save_progress('Failed to connect to HackerOne', True)
             return self.set_status(phantom.APP_ERROR, 'Failed to connect to HackerOne')
 
     def handle_action(self, param):
@@ -704,6 +733,11 @@ class HackerOneConnector(BaseConnector):
 
         action = self.get_action_identifier()
         ret_val = phantom.APP_SUCCESS
+
+        try:
+            self.debug_logging = self.get_config()['debug_logging']
+        except:
+            pass
 
         if action == ACTION_ID_GET_ALL:
             ret_val = self._get_reports(param, action_result)

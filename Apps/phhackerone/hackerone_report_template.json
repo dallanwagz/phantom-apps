@@ -103,6 +103,21 @@
                                     "handle": "actor_username"
                                 }
                             }
+                        },
+                        "attachments": {
+                            "data": [
+                                "comment-attachments",
+                                {
+                                    "id": "id",
+                                    "attributes": {
+                                        "file_name": "file_name",
+                                        "content_type": "content_type",
+                                        "file_size": "file_size",
+                                        "created_at": "created_at",
+                                        "expiring_url": "expiring_url"
+                                    }
+                                }
+                            ]
                         }
                     }
                 }
