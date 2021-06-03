@@ -3,6 +3,12 @@
     "name": "HackerOne",
     "description": "This app integrates with HackerOne to support various generic and investigative actions",
     "publisher": "Splunk Community",
+    "contributors": [
+      {
+        "name": "Mhike Funderburk",
+        "name": "Dallan Wagner"
+      }
+    ],
     "type": "generic",
     "main_module": "hackerone_connector.pyc",
     "app_version": "2.2.0",
