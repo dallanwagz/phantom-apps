@@ -26,7 +26,7 @@
             "data": [
                 "bounties",
                 {
-                    "id": "bounty_id",
+                    "id": "id",
                     "type": "bounty_type",
                     "attributes": {
                         "amount": "bounty_amount",

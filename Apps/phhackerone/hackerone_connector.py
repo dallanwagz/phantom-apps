@@ -659,7 +659,20 @@ class HackerOneConnector(BaseConnector):
                 artifact['cef'] = report
                 artifacts.append(artifact)
                 try:
+                    for bounty in report['bounties']:
+                        # self.__print('bounties -- what is here? {}'.format(bounty), False)
+                        artifact = {}
+                        artifact['label'] = 'report bounty'
+                        artifact['name'] = 'Bounty - {0}'.format(bounty['id'])
+                        artifact['source_data_identifier'] = 'HackerOne report - {0}: Bounty - {1}'.format(report['id'], bounty['id'])
+                        artifact['severity'] = 'medium'
+                        artifact['cef'] = bounty
+                        artifacts.append(artifact)
+                except:
+                    pass
+                try:
                     for comment in report['comments']:
+                        # self.__print('comments -- what is here? {}'.format(comment), False)
                         artifact = {}
                         artifact['label'] = 'report comment'
                         artifact['name'] = 'Comment - {0}'.format(comment['id'])
@@ -671,6 +684,7 @@ class HackerOneConnector(BaseConnector):
                     pass
                 try:
                     for attachment in report['attachments']:
+                        # self.__print('attachments -- what is here? {}'.format(attachment), False)
                         artifact = {}
                         artifact['label'] = 'report attachment'
                         artifact['name'] = 'Attachment - {0}'.format(attachment['id'])
