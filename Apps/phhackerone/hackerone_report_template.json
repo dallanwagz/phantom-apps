@@ -30,7 +30,7 @@
                     "type": "bounty_type",
                     "attributes": {
                         "amount": "bounty_amount",
-                        "awarded_amount": "bounty_awarded_amount",
+                        "bonus_amount": "bonus_amount",
                         "created_at": "bounty_created_at"
                     }
                 }
