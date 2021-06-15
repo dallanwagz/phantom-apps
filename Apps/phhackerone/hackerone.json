@@ -11,7 +11,7 @@
     ],
     "type": "generic",
     "main_module": "hackerone_connector.pyc",
-    "app_version": "2.2.0",
+    "app_version": "2.2.1",
     "utctime_updated": "2020-01-28T00:00:00.000000Z",
     "package_name": "phantom_hackerone",
     "product_vendor": "HackerOne",
