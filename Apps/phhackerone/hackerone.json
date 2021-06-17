@@ -11,7 +11,7 @@
     ],
     "type": "generic",
     "main_module": "hackerone_connector.pyc",
-    "app_version": "2.2.8",
+    "app_version": "2.3.0",
     "utctime_updated": "2020-01-28T00:00:00.000000Z",
     "package_name": "phantom_hackerone",
     "product_vendor": "HackerOne",
@@ -41,31 +41,37 @@
             "order": 2,
             "required": true
         },
+        "program_id": {
+            "description": "HackerOne Program ID",
+            "data_type": "numeric",
+            "order": 3,
+            "required": true
+        },
         "state_filter": {
             "description": "Filter for report state (to be used when polling)",
             "data_type": "string",
-            "order": 3
+            "order": 4
         },
         "assignment_filter": {
             "description": "Filter for report assignment (to be used when polling)",
             "data_type": "string",
-            "order": 4
+            "order": 5
         },
         "full_comments": {
             "description": "Collect comments for reports (to be used when polling, much slower)",
             "data_type": "boolean",
-            "order": 5
+            "order": 6
         },
         "phantom_api_token": {
             "description": "Phantom API token for updating existing containers",
             "data_type": "password",
-            "order": 6,
+            "order": 7,
             "required": true
         },
         "debug_logging": {
             "description": "Toggle verbose logging in debug log and spawn log",
             "data_type": "boolean",
-            "order": 7
+            "order": 8
         }
     },
     "actions": [
@@ -77,6 +83,57 @@
             "read_only": true,
             "parameters": {},
             "output": [],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "get bounty balance",
+            "description": "Get the current bounty balance for the specified program (defaults to asset config).",
+            "type": "investigate",
+            "identifier": "get_bounty_balance",
+            "read_only": true,
+            "parameters": {
+                "program_id": {
+                    "description": "Numeric program ID of the program",
+                    "data_type": "numeric",
+                    "order": 0,
+                    "required": false
+                  }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.program_id",
+                    "data_type": "numeric",
+                    "column_name": "Program ID",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.remaining_balance",
+                    "data_type": "numeric",
+                    "column_name": "Remaining Balance",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ],
+                    "column_name": "Status",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
             "versions": "EQ(*)"
         },
         {

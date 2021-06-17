@@ -204,7 +204,6 @@ class HackerOneConnector(BaseConnector):
     def _get_rest_data(self, url, url_params):
         self.__print('Start: _get_rest_data()', False)
         try:
-            self.__print(url, False)
             u, p = self._get_auth()
             if url_params:
                 response = requests.get(url, auth=(u, p), params=url_params, headers=self._get_headers(), verify=False)
@@ -217,9 +216,9 @@ class HackerOneConnector(BaseConnector):
                 return None, None
             code = response.status_code
             if code == 200:
-                if 'links' in content:
+               if 'links' in content:
                     return content['data'], content['links']
-                else:
+               else:
                     return content['data'], None
             else:
                 self.__print(code, False)
@@ -345,6 +344,31 @@ class HackerOneConnector(BaseConnector):
             self.__print('Exception occurred while updating tracking id', True)
             action_result.add_exception_details(err)
             return action_result.set_status(phantom.APP_ERROR, 'Exception occurred while updating tracking id')
+
+    def _get_bounty_balance(self, param, action_result):
+        self.__print('_get_bounty_balance()', False)
+        config = self.get_config()
+
+        if self._handle_unicode_for_input_str(param.get('program_id')):
+            program_id = self._handle_unicode_for_input_str(param.get('program_id'))
+        else:
+            program_id = self._handle_unicode_for_input_str(config['program_id'])
+        try:
+            url = "https://api.hackerone.com/v1/programs/{0}/billing/balance".format(program_id)
+            response, links = self._get_rest_data(url, None)
+            if response:
+                balance = response['attributes']['balance']
+                action_result.add_data({"succeeded": True, "remaining_balance": balance})
+                self.__print('Successfully retrieved program balance', True)
+                return action_result.set_status(phantom.APP_SUCCESS, 'Successfully retrieved program balance')
+            else:
+                self.__print('Failed to retrieve program balance', True)
+                return action_result.set_status(phantom.APP_ERROR, 'Failed to retrieve program balance')
+        except Exception as e:
+            err = self._get_error_message_from_exception(e)
+            self.__print('Exception occurred while retrieving program balance {}'.format(err), True)
+            action_result.add_exception_details(err)
+            return action_result.set_status(phantom.APP_ERROR, 'Exception occurred while retrieve program balance')
 
     def _uppercase(self, string):
         output = ''
@@ -767,6 +791,9 @@ class HackerOneConnector(BaseConnector):
 
         elif action == ACTION_ID_UNASSIGN:
             ret_val = self._unassign_report(param, action_result)
+
+        elif action == ACTION_ID_GET_BOUNTY_BALANCE:
+            ret_val = self._get_bounty_balance(param, action_result)
 
         elif action == ACTION_ID_ON_POLL:
             self.is_polling_action = True
