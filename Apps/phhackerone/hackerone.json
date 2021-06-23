@@ -11,7 +11,7 @@
     ],
     "type": "generic",
     "main_module": "hackerone_connector.pyc",
-    "app_version": "2.3.0",
+    "app_version": "2.5.0",
     "utctime_updated": "2020-01-28T00:00:00.000000Z",
     "package_name": "phantom_hackerone",
     "product_vendor": "HackerOne",
@@ -41,37 +41,31 @@
             "order": 2,
             "required": true
         },
-        "program_id": {
-            "description": "HackerOne Program ID",
-            "data_type": "numeric",
-            "order": 3,
-            "required": true
-        },
         "state_filter": {
             "description": "Filter for report state (to be used when polling)",
             "data_type": "string",
-            "order": 4
+            "order": 3
         },
         "assignment_filter": {
             "description": "Filter for report assignment (to be used when polling)",
             "data_type": "string",
-            "order": 5
+            "order": 4
         },
         "full_comments": {
             "description": "Collect comments for reports (to be used when polling, much slower)",
             "data_type": "boolean",
-            "order": 6
+            "order": 5
         },
         "phantom_api_token": {
             "description": "Phantom API token for updating existing containers",
             "data_type": "password",
-            "order": 7,
+            "order": 6,
             "required": true
         },
         "debug_logging": {
             "description": "Toggle verbose logging in debug log and spawn log",
             "data_type": "boolean",
-            "order": 8
+            "order": 7
         }
     },
     "actions": [

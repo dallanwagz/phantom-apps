@@ -345,14 +345,47 @@ class HackerOneConnector(BaseConnector):
             action_result.add_exception_details(err)
             return action_result.set_status(phantom.APP_ERROR, 'Exception occurred while updating tracking id')
 
+    def _get_program_id(self, config):
+        self.__print('_get_program_id()', False)
+        self.load_state()
+        current_state = self.get_state()
+        self.__print('state file contents: {}'.format(current_state), False)
+        program_name = self._handle_unicode_for_input_str(config['program_name'])
+
+        try:
+            program_id = current_state['program_id']
+            self.__print('program ID obtained from state file', False)
+            return program_id
+
+        except:
+            url = "https://api.hackerone.com/v1/me/programs"
+            response, links = self._get_rest_data(url, None)
+            if response:
+                for program in response:
+                    if program['attributes']['handle'] == program_name:
+                        program_id = program['id']
+                        if current_state:
+                            current_state['program_id'] = program_id
+                        else:
+                            current_state = {'program_id': program_id}
+                        self.__print('state file contents: {}'.format(current_state), False)
+                        self.save_state(current_state)
+                        self.__print('program ID obtained from REST API /me/programs endpoint', False)
+                        return program_id      
+   
     def _get_bounty_balance(self, param, action_result):
         self.__print('_get_bounty_balance()', False)
         config = self.get_config()
+        program_id = self._get_program_id(config)
 
+        #overwrite program_id in state file/associated with program name if specified in action
         if self._handle_unicode_for_input_str(param.get('program_id')):
             program_id = self._handle_unicode_for_input_str(param.get('program_id'))
-        else:
-            program_id = self._handle_unicode_for_input_str(config['program_id'])
+
+        if not program_id:
+            self.__print('unable to obtain program id, getting bounty impossible.', False)
+            return action_result.set_status(phantom.APP_ERROR, 'Failed to obtain bounty balance because no program ID was determined')
+
         try:
             url = "https://api.hackerone.com/v1/programs/{0}/billing/balance".format(program_id)
             response, links = self._get_rest_data(url, None)
