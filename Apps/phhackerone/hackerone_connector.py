@@ -403,6 +403,58 @@ class HackerOneConnector(BaseConnector):
             action_result.add_exception_details(err)
             return action_result.set_status(phantom.APP_ERROR, 'Exception occurred while retrieve program balance')
 
+    def _get_billing_transactions(self, param, action_result):
+        self.__print('_get_billing_transactions()', False)
+        config = self.get_config()
+        program_id = self._get_program_id(config)
+
+        #overwrite program_id in state file/associated with program name if specified in action
+        if self._handle_unicode_for_input_str(param.get('program_id')):
+            program_id = self._handle_unicode_for_input_str(param.get('program_id'))
+
+        if not program_id:
+            self.__print('unable to obtain program id, getting billing transactions impossible.', False)
+            return action_result.set_status(phantom.APP_ERROR, 'Failed to obtain billing transactions because no program ID was determined')
+
+        #these are required params, trusting phantom validation
+        month = self._handle_unicode_for_input_str(param.get('month'))
+        year = self._handle_unicode_for_input_str(param.get('year'))
+
+        try:
+            url = "https://api.hackerone.com/v1/programs/{0}/billing/transactions?month={1}&year={2}".format(program_id, month, year)
+            self.__print('url: {}'.format(url),False)
+            response, links = self._get_rest_data(url, None)
+            if response:
+                for transaction in response:
+                     self.__print('transaction: {}'.format(transaction),False)
+                     try:
+                         transaction_object = {}
+                         transaction_object['transaction_id'] = transaction['id']
+                         transaction_object['transaction_type'] = transaction['type']
+                         transaction_object['activity_date'] = transaction['attributes']['activity_date']
+                         transaction_object['activity_description'] = transaction['attributes']['activity_description']
+                         transaction_object['debit_or_credit_amount'] = transaction['attributes']['debit_or_credit_amount']
+                         transaction_object['associated_report'] = transaction['relationships']['report']['data']['id']
+                         action_result.add_data(transaction_object)
+
+                     except Exception as e:
+                         err = self._get_error_message_from_exception(e)
+                         self.__print('Exception occurred while parsing REST response {}'.format(err), True)
+                         action_result.add_exception_details(err)
+                         return action_result.set_status(phantom.APP_ERROR, 'Exception occurred while parsing REST reponse')
+
+                self.__print('Successfully retrieved transaction details', True)
+                return action_result.set_status(phantom.APP_SUCCESS, 'Successfully retrieved transaction details')
+            else:
+                self.__print('Failed to retrieve transaction details', True)
+                return action_result.set_status(phantom.APP_ERROR, 'Failed to retrieve transaction dteails. REST call returned null')
+
+        except Exception as e:
+            err = self._get_error_message_from_exception(e)
+            self.__print('Exception occurred while retrieving transaction details {}'.format(err), True)
+            action_result.add_exception_details(err)
+            return action_result.set_status(phantom.APP_ERROR, 'Exception occurred while retrieving transaction details')
+
     def _uppercase(self, string):
         output = ''
         for value in string.split(' '):
@@ -827,6 +879,9 @@ class HackerOneConnector(BaseConnector):
 
         elif action == ACTION_ID_GET_BOUNTY_BALANCE:
             ret_val = self._get_bounty_balance(param, action_result)
+
+        elif action == ACTION_ID_GET_BILLING_TRANSACTIONS: 
+            ret_val = self._get_billing_transactions(param, action_result)
 
         elif action == ACTION_ID_ON_POLL:
             self.is_polling_action = True

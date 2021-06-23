@@ -12,6 +12,7 @@ ACTION_ID_UNASSIGN = 'unassign'
 ACTION_ID_ON_POLL = 'on_poll'
 ACTION_ID_TEST = 'test_asset_connectivity'
 ACTION_ID_GET_BOUNTY_BALANCE = 'get_bounty_balance'
+ACTION_ID_GET_BILLING_TRANSACTIONS = 'get_billing_transactions'
 
 # Constants for error messages
 ERR_CODE_MSG = "Error code unavailable"

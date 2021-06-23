@@ -176,37 +176,37 @@
                     "column_order": 2
                 },
                 {
-                    "data_path": "action_result.data.*.values.transaction_id",
+                    "data_path": "action_result.data.value.*.transaction_id",
                     "data_type": "numeric",
                     "column_name": "Transaction ID",
                     "column_order": 3
                 },
                 {
-                    "data_path": "action_result.data.*.values.transaction_type",
+                    "data_path": "action_result.data.value.*.transaction_type",
                     "data_type": "string",
                     "column_name": "Transaction Type",
                     "column_order": 4
                 },
                 {
-                    "data_path": "action_result.data.*.values.activity_date",
+                    "data_path": "action_result.data.value.*.activity_date",
                     "data_type": "string",
                     "column_name": "Activity Date",
                     "column_order": 5
                 },
                 {
-                    "data_path": "action_result.data.*.values.activity_description",
+                    "data_path": "action_result.data.value.*.activity_description",
                     "data_type": "string",
                     "column_name": "Activity Description",
                     "column_order": 6
                 },
                 {
-                    "data_path": "action_result.data.*.values.debit_or_credit_amount",
+                    "data_path": "action_result.data.value.*.debit_or_credit_amount",
                     "data_type": "string",
                     "column_name": "Debit or Credit amount",
                     "column_order": 7
                 },
                 {
-                    "data_path": "action_result.data.*.values.associated_report",
+                    "data_path": "action_result.data.value.*.associated_report",
                     "data_type": "string",
                     "column_name": "Associated report ID",
                     "column_order": 8
