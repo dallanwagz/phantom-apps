@@ -50,7 +50,8 @@
             "data": {
                 "attributes": {
                     "asset_identifier": "asset_identifier",
-                    "asset_type": "asset_type"
+                    "asset_type": "asset_type",
+                    "reference": "budget_reference"
                 }
             }
         },
